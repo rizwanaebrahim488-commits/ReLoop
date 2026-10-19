@@ -171,26 +171,6 @@ export function CategoriesPage() {
             );
           })}
         </div>
-
-        {/* Clean Direct Collection Notice */}
-        <div className="mt-12 bg-white rounded-2xl p-4 sm:p-5 border border-charcoal-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-charcoal-600">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-forest-100 text-forest-800 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-bold text-charcoal-900 block">Direct Peer-to-Peer Pickups Only</span>
-              <span>ReLoop connects community members directly. Pickups and transportation are coordinated independently.</span>
-            </div>
-          </div>
-          <Link
-            to="/how-it-works"
-            className="text-forest-700 hover:text-forest-800 font-bold whitespace-nowrap inline-flex items-center gap-1"
-          >
-            <span>Learn How It Works</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
       </div>
     </div>
   );

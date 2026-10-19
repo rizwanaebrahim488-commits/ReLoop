@@ -103,19 +103,6 @@ export function AboutPage() {
           </div>
         </div>
 
-        {/* CRITICAL DIRECT COLLECTION DISCLAIMER */}
-        <div className="bg-amber-50 border-2 border-amber-300/80 rounded-3xl p-8 text-amber-950 space-y-4">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="w-8 h-8 text-amber-600 shrink-0" />
-            <h2 className="text-xl font-bold">Important Direct Collection Charter</h2>
-          </div>
-          <p className="text-xs sm:text-sm leading-relaxed">
-            <strong>ReLoop is strictly a coordination platform.</strong> We do NOT operate courier fleets, shipping integrations, or delivery partnerships. Buyers and sellers communicate directly via private messaging, inspect items on-site, and independently arrange their own collection, transportation, and exchange terms.
-          </p>
-          <p className="text-xs sm:text-sm leading-relaxed">
-            This direct handoff model ensures items are personally inspected for safety and condition before handoff, eliminating unnecessary packaging and freight emissions.
-          </p>
-        </div>
 
         {/* CTA */}
         <div className="text-center pt-4">

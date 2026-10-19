@@ -66,16 +66,7 @@ export function Navbar() {
     }`;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-charcoal-100">
-      {/* Top Banner Notice */}
-      <div className="bg-forest-900 text-forest-100 text-[11px] sm:text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 font-medium">
-        <span>🌱 Independent collection only — ReLoop does not provide delivery services.</span>
-        {!isSupabaseConnected && (
-          <span className="hidden md:inline-block bg-forest-800 text-forest-200 px-2 py-0.5 rounded-full text-[10px]">
-            Demo Database Active
-          </span>
-        )}
-      </div>
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-xs">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">

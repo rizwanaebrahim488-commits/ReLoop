@@ -135,9 +135,9 @@ export function HowItWorksPage() {
             </div>
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-forest-600">Step 4</span>
-              <h2 className="text-xl font-bold text-charcoal-900">Independent Collection</h2>
+              <h2 className="text-xl font-bold text-charcoal-900">Local Pickup & Reuse</h2>
               <p className="text-xs sm:text-sm text-charcoal-600 leading-relaxed">
-                Click "View on Google Maps" on the listing to find the collection spot or navigate directly. Inspect the items in person to verify quality and safety. Once loaded, either party marks the exchange as completed on ReLoop to record community waste diversion.
+                Click "View on Google Maps" on the listing to navigate to the location. Inspect items in person to verify quality and condition, and give them a useful second life.
               </p>
             </div>
           </div>

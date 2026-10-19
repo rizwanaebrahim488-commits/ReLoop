@@ -7,7 +7,6 @@ import {
   PlusCircle,
   FileQuestion,
   Search,
-  ShieldCheck,
   CheckCircle2,
   Users,
   Package,
@@ -80,44 +79,42 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-radial from-forest-800 via-forest-900 to-forest-950 text-white pt-16 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#52b788_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto text-center space-y-7">
+      {/* CLEAN, VIBRANT GREEN HERO SECTION */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-fresh-50/90 via-white to-offwhite border-b border-forest-100/90 pt-16 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto text-center space-y-7">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-forest-800/80 border border-forest-600/50 text-fresh-300 text-xs sm:text-sm font-semibold backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-fresh-400" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-forest-100 text-forest-800 text-xs sm:text-sm font-bold border border-forest-200 shadow-2xs">
+            <Sparkles className="w-4 h-4 text-forest-700" />
             <span>ReLoop — One Resource, Many Possibilities</span>
           </div>
 
-          {/* Heading */}
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.15] text-white">
+          {/* Heading - Maximum Visibility High-Contrast Typography */}
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.12] text-charcoal-900">
             Give Every Resource a <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-fresh-300 via-fresh-400 to-emerald-200">
+            <span className="text-forest-700">
               Second Life.
             </span>
           </h1>
 
           {/* Description */}
-          <p className="max-w-2xl mx-auto text-sm sm:text-lg text-forest-200 leading-relaxed font-normal">
-            Connect directly with neighbors, workshops, charities, and makers to share, sell, donate, or find reusable goods. No delivery middlemen — direct collection only.
+          <p className="max-w-2xl mx-auto text-base sm:text-lg text-charcoal-600 leading-relaxed font-normal">
+            Connect with local neighbors, workshops, charities, and makers to share, sell, donate, or find reusable goods in your community.
           </p>
 
-          {/* Integrated Quick Search Box (OLX style) */}
-          <div className="max-w-2xl mx-auto pt-2">
-            <form onSubmit={handleHeroSearch} className="relative flex items-center shadow-2xl rounded-2xl bg-white p-1.5 border border-white/20">
-              <Search className="w-5 h-5 text-charcoal-400 ml-3.5 shrink-0" />
+          {/* Integrated Quick Search Box (Clean Green Accent Style) */}
+          <div className="max-w-2xl mx-auto pt-1">
+            <form onSubmit={handleHeroSearch} className="relative flex items-center shadow-lg shadow-forest-900/5 rounded-2xl bg-white p-2 border-2 border-forest-200 focus-within:border-forest-600 transition">
+              <Search className="w-5 h-5 text-forest-600 ml-3 shrink-0" />
               <input
                 type="text"
                 value={heroSearch}
                 onChange={(e) => setHeroSearch(e.target.value)}
                 placeholder="Search items (e.g. laptop, timber, desk, books) or city..."
-                className="w-full px-3 py-3 text-xs sm:text-sm text-charcoal-900 placeholder-charcoal-400 focus:outline-none bg-transparent"
+                className="w-full px-3 py-2 text-xs sm:text-sm text-charcoal-900 placeholder-charcoal-400 focus:outline-none bg-transparent"
               />
               <button
                 type="submit"
-                className="px-5 py-3 rounded-xl bg-fresh-500 hover:bg-fresh-400 text-forest-950 font-bold text-xs sm:text-sm transition shadow-sm shrink-0"
+                className="px-5 py-2.5 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs sm:text-sm transition shadow-sm shrink-0"
               >
                 Search
               </button>
@@ -125,12 +122,12 @@ export function HomePage() {
 
             {/* Quick Category Chips below Hero Search */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-3 text-xs">
-              <span className="text-forest-300/80 text-[11px] font-medium mr-1">Popular:</span>
+              <span className="text-charcoal-500 text-[11px] font-semibold mr-1">Popular:</span>
               {['Electronics', 'Furniture', 'Tools & DIY', 'Free Stuff', 'Clothing', 'Books'].map((tag, idx) => (
                 <Link
                   key={idx}
                   to={`/resources?search=${encodeURIComponent(tag)}`}
-                  className="px-2.5 py-1 rounded-full bg-forest-800/80 hover:bg-forest-700 text-forest-200 hover:text-white border border-forest-700/60 transition text-[11px] font-medium"
+                  className="px-3 py-1 rounded-full bg-white hover:bg-forest-50 text-forest-800 hover:text-forest-900 border border-forest-200 shadow-2xs transition text-[11px] font-semibold"
                 >
                   {tag}
                 </Link>
@@ -142,34 +139,28 @@ export function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               to="/resources"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-forest-900 font-bold text-xs sm:text-sm hover:bg-forest-50 transition shadow-sm"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs sm:text-sm transition shadow-md shadow-forest-900/15"
             >
-              <Search className="w-4 h-4 text-forest-700" />
+              <Search className="w-4 h-4 text-fresh-300" />
               <span>Explore Marketplace</span>
             </Link>
 
             <Link
               to="/resources/create"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-forest-800/90 hover:bg-forest-700 text-white font-semibold text-xs sm:text-sm border border-forest-600/70 transition"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-forest-50 text-forest-800 font-bold text-xs sm:text-sm border-2 border-forest-600 shadow-xs transition"
             >
-              <PlusCircle className="w-4 h-4 text-fresh-300" />
+              <PlusCircle className="w-4 h-4 text-forest-600" />
               <span>List a Resource</span>
             </Link>
 
             <Link
               to="/needs/create"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-forest-950/70 hover:bg-forest-950 text-forest-200 hover:text-white font-semibold text-xs sm:text-sm border border-forest-800 transition"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-forest-100/80 hover:bg-forest-100 text-forest-900 font-bold text-xs sm:text-sm border border-forest-200 shadow-xs transition"
             >
-              <FileQuestion className="w-4 h-4 text-forest-400" />
+              <FileQuestion className="w-4 h-4 text-forest-700" />
               <span>Publish a Need</span>
             </Link>
           </div>
-
-          {/* Direct Collection Clarification */}
-          <p className="text-[11px] sm:text-xs text-forest-300/80 pt-2 flex items-center justify-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-fresh-400 shrink-0" />
-            <span>Independent direct arrangement — ReLoop does not operate delivery services or delivery partners.</span>
-          </p>
         </div>
       </section>
 
@@ -280,7 +271,7 @@ export function HomePage() {
               How ReLoop Works
             </h3>
             <p className="text-xs sm:text-sm text-charcoal-600 mt-2">
-              Share locally and arrange pickup directly with complete independence.
+              Share, connect, and give reusable materials a second life.
             </p>
           </div>
 
@@ -311,7 +302,7 @@ export function HomePage() {
               </div>
               <h4 className="font-bold text-sm text-charcoal-900 mb-1.5">Chat Directly</h4>
               <p className="text-xs text-charcoal-600 leading-relaxed">
-                Coordinate details, confirm condition, and agree on collection times using in-app messaging.
+                Coordinate details, confirm condition, and agree on meetup times using in-app messaging.
               </p>
             </div>
 
@@ -319,9 +310,9 @@ export function HomePage() {
               <div className="w-10 h-10 rounded-xl bg-forest-100 text-forest-800 flex items-center justify-center mx-auto mb-3 font-black text-base">
                 4
               </div>
-              <h4 className="font-bold text-sm text-charcoal-900 mb-1.5">Independent Pickup</h4>
+              <h4 className="font-bold text-sm text-charcoal-900 mb-1.5">Pick Up & Reuse</h4>
               <p className="text-xs text-charcoal-600 leading-relaxed">
-                Navigate via Google Maps links, inspect items in person, and complete the handoff directly.
+                Meet locally via Google Maps directions, verify items in person, and give them a useful second life.
               </p>
             </div>
           </div>
@@ -447,24 +438,24 @@ export function HomePage() {
       </section>
 
       {/* FINAL CALL TO ACTION */}
-      <section className="py-16 bg-forest-900 text-white text-center px-4">
+      <section className="py-16 bg-gradient-to-r from-forest-800 to-forest-900 text-white text-center px-4">
         <div className="max-w-3xl mx-auto space-y-6">
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             Have Resources to Share or Looking for Supplies?
           </h2>
           <p className="text-xs sm:text-sm text-forest-200">
-            Join conscious community members, workshops, NGOs, and makers on ReLoop today. Free to register, no delivery middle-men.
+            Join conscious community members, workshops, NGOs, and makers on ReLoop today. Free to register, connect directly with your local community.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/register"
-              className="px-6 py-3 rounded-xl bg-fresh-500 text-forest-950 font-bold text-xs sm:text-sm hover:bg-fresh-400 transition shadow-md"
+              className="px-6 py-3.5 rounded-xl bg-fresh-400 hover:bg-fresh-300 text-forest-950 font-bold text-xs sm:text-sm transition shadow-md"
             >
               Create Free Account
             </Link>
             <Link
               to="/resources"
-              className="px-6 py-3 rounded-xl bg-forest-800 text-white font-semibold text-xs sm:text-sm hover:bg-forest-700 transition border border-forest-700"
+              className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm transition border border-white/20"
             >
               Browse All Resources
             </Link>
