@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReLoop - Redirecting...</title>
+    <script>
+      // Single Page App redirect for GitHub Pages
+      // Redirects 404 routes back to the main repository index with hash route
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      var repoPath = '/' + l.pathname.split('/').slice(1, 1 + pathSegmentsToKeep).join('/');
+      var routePath = l.pathname.split('/').slice(1 + pathSegmentsToKeep).join('/');
+      var target = repoPath + '/#/' + routePath + (l.search ? l.search : '') + l.hash;
+      window.location.replace(target);
+    </script>
+  </head>
+  <body>
+    <p style="font-family: sans-serif; text-align: center; margin-top: 50px; color: #555;">
+      Redirecting to ReLoop...
+    </p>
+  </body>
+</html>
