@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && node -e \"require('fs').cpSync('dist', 'docs', {recursive: true})\"",
+    "dev": "node -e \"require('fs').copyFileSync('index.dev.html', 'index.html')\" && vite",
+    "build": "node -e \"require('fs').copyFileSync('index.dev.html', 'index.html')\" && vite build && node -e \"require('fs').cpSync('dist', '.', {recursive: true}); require('fs').cpSync('dist', 'docs', {recursive: true})\"",
     "preview": "vite preview"
   },
   "dependencies": {
