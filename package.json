@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node -e \"require('fs').copyFileSync('index.dev.html', 'index.html')\" && vite",
-    "build": "node -e \"require('fs').copyFileSync('index.dev.html', 'index.html')\" && vite build && node -e \"require('fs').cpSync('dist', '.', {recursive: true}); require('fs').cpSync('dist', 'docs', {recursive: true})\"",
+    "build": "node -e \"require('fs').copyFileSync('index.dev.html', 'index.html')\" && vite build && node -e \"const fs = require('fs'); fs.cpSync('dist', '.', {recursive: true}); fs.cpSync('dist', 'docs', {recursive: true}); fs.copyFileSync('dist/index.html', 'index.html'); fs.copyFileSync('dist/index.html', '404.html'); fs.copyFileSync('dist/index.html', 'docs/index.html'); fs.copyFileSync('dist/index.html', 'docs/404.html'); fs.writeFileSync('.nojekyll', ''); fs.writeFileSync('docs/.nojekyll', ''); fs.writeFileSync('dist/.nojekyll', '');\"",
     "preview": "vite preview"
   },
   "dependencies": {
