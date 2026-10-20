@@ -126,6 +126,57 @@ export async function createSupportRequest({ userId, name, email, subject, messa
   return newTicket;
 }
 
+export async function deleteSupportTicket(ticketId) {
+  let support = getStoreData(STORAGE_KEYS.SUPPORT);
+  support = support.filter(s => s.id !== ticketId);
+  setStoreData(STORAGE_KEYS.SUPPORT, support);
+  return { success: true };
+}
+
+export async function getAllListings() {
+  const resources = getStoreData(STORAGE_KEYS.RESOURCES);
+  const profiles = getStoreData(STORAGE_KEYS.PROFILES);
+  return resources.map(res => ({
+    ...res,
+    seller: profiles.find(p => p.id === res.user_id) || { full_name: 'Community Member', email: '' }
+  }));
+}
+
+export async function updateListingModeration(resourceId, updates) {
+  const resources = getStoreData(STORAGE_KEYS.RESOURCES);
+  const idx = resources.findIndex(r => r.id === resourceId);
+  if (idx !== -1) {
+    resources[idx] = { ...resources[idx], ...updates, updated_at: new Date().toISOString() };
+    setStoreData(STORAGE_KEYS.RESOURCES, resources);
+    return resources[idx];
+  }
+  return null;
+}
+
+export async function deleteListing(resourceId) {
+  let resources = getStoreData(STORAGE_KEYS.RESOURCES);
+  resources = resources.filter(r => r.id !== resourceId);
+  setStoreData(STORAGE_KEYS.RESOURCES, resources);
+  return { success: true };
+}
+
+export async function updateUserAdmin(userId, isAdmin) {
+  const profiles = getStoreData(STORAGE_KEYS.PROFILES);
+  const profile = profiles.find(p => p.id === userId);
+  if (profile) {
+    profile.is_admin = isAdmin;
+    setStoreData(STORAGE_KEYS.PROFILES, profiles);
+  }
+  return profile;
+}
+
+export async function deleteUser(userId) {
+  let profiles = getStoreData(STORAGE_KEYS.PROFILES);
+  profiles = profiles.filter(p => p.id !== userId);
+  setStoreData(STORAGE_KEYS.PROFILES, profiles);
+  return { success: true };
+}
+
 export async function createReport({ reporterId, reportedResourceId, reportedUserId, reason, description }) {
   const reports = getStoreData(STORAGE_KEYS.REPORTS);
   const newReport = {

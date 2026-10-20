@@ -10,12 +10,8 @@ import { BrowseResourcesPage } from './pages/BrowseResourcesPage';
 import { ResourceDetailsPage } from './pages/ResourceDetailsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { AboutPage } from './pages/AboutPage';
-import { HowItWorksPage } from './pages/HowItWorksPage';
-import { SafetyGuidelinesPage } from './pages/SafetyGuidelinesPage';
-import { ContactPage } from './pages/ContactPage';
 
 // Auth Pages
-import { RegisterPage } from './pages/RegisterPage';
 import { LoginPage } from './pages/LoginPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
@@ -62,12 +58,14 @@ export function App() {
           <Route path="/resources/:id" element={<ResourceDetailsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/safety-and-guidelines" element={<SafetyGuidelinesPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/how-it-works" element={<AboutPage />} />
+          <Route path="/support" element={<AboutPage />} />
+          <Route path="/safety" element={<AboutPage />} />
+          <Route path="/contact" element={<AboutPage />} />
+          <Route path="/safety-and-guidelines" element={<AboutPage />} />
 
           {/* Auth Pages */}
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/register" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -187,39 +185,12 @@ export function App() {
             }
           />
 
-          {/* Admin Pages */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminUsersPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/listings"
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminListingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/reports"
-            element={
-              <ProtectedRoute requireAdmin>
-                <AdminReportsPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Admin Moderation Portal (OLX Model) */}
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/support" element={<AdminDashboardPage />} />
+          <Route path="/admin/users" element={<AdminDashboardPage />} />
+          <Route path="/admin/listings" element={<AdminDashboardPage />} />
+          <Route path="/admin/reports" element={<AdminDashboardPage />} />
 
           {/* Fallback */}
           <Route path="*" element={<HomePage />} />

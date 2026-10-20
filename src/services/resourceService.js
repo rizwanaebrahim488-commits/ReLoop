@@ -4,7 +4,18 @@ import { calculateDistanceKm } from '../utils/maps';
 import { matchesCategory } from '../utils/categories';
 
 export async function getResources(filters = {}) {
-  const { category, search, listingType, condition, sort = 'newest', userLat, userLng, status = 'active' } = filters;
+  const {
+    category,
+    search,
+    listingType,
+    condition,
+    quantityType = 'all',
+    locationQuery = '',
+    sort = 'newest',
+    userLat,
+    userLng,
+    status = 'active'
+  } = filters;
 
   if (isConfigured) {
     try {
@@ -74,6 +85,20 @@ export async function getResources(filters = {}) {
   }
   if (condition && condition !== 'all') {
     items = items.filter(r => r.condition === condition);
+  }
+  if (quantityType && quantityType !== 'all') {
+    if (quantityType === 'single') {
+      items = items.filter(r => r.quantity === 1 || r.allow_partial_quantity === false);
+    } else if (quantityType === 'bulk') {
+      items = items.filter(r => r.quantity > 1);
+    }
+  }
+  if (locationQuery && locationQuery !== 'all' && locationQuery.trim()) {
+    const locLower = locationQuery.toLowerCase().trim();
+    items = items.filter(r =>
+      (r.location_name && r.location_name.toLowerCase().includes(locLower)) ||
+      (r.city && r.city.toLowerCase().includes(locLower))
+    );
   }
   if (search) {
     const q = search.toLowerCase();

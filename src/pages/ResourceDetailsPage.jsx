@@ -22,8 +22,6 @@ import { toggleFavorite, checkIsFavorite } from '../services/favoritesService';
 import { createRequest } from '../services/requestsService';
 import { getOrCreateConversation } from '../services/messagesService';
 import { createReport } from '../services/adminService';
-import { GoogleMapsButton } from '../components/GoogleMapsButton';
-import { ResourceLocationMap } from '../components/ResourceLocationMap';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { formatPublicLocation } from '../utils/maps';
@@ -365,25 +363,25 @@ export function ResourceDetailsPage() {
                   <>
                     <button
                       type="button"
-                      disabled={!isAvailable}
-                      onClick={handleOpenRequestModal}
-                      className={`w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition shadow-md ${
-                        isAvailable
-                          ? 'bg-forest-700 text-white hover:bg-forest-800 active:scale-98 shadow-forest-900/20'
-                          : 'bg-charcoal-200 text-charcoal-400 cursor-not-allowed'
-                      }`}
+                      onClick={handleContactSeller}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs sm:text-sm transition shadow-md shadow-forest-900/15 active:scale-98"
                     >
-                      <Package className="w-4 h-4" />
-                      <span>{isAvailable ? 'Request / Reserve Quantity' : 'Resource Unavailable'}</span>
+                      <MessageSquare className="w-4 h-4 text-fresh-300" />
+                      <span>Chat with Seller</span>
                     </button>
 
                     <button
                       type="button"
-                      onClick={handleContactSeller}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-charcoal-200 text-charcoal-800 font-semibold text-xs sm:text-sm hover:bg-charcoal-50 transition"
+                      disabled={!isAvailable}
+                      onClick={handleOpenRequestModal}
+                      className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm border transition ${
+                        isAvailable
+                          ? 'border-forest-600 text-forest-800 bg-forest-50 hover:bg-forest-100'
+                          : 'bg-charcoal-100 text-charcoal-400 border-charcoal-200 cursor-not-allowed'
+                      }`}
                     >
-                      <MessageSquare className="w-4 h-4 text-forest-600" />
-                      <span>Contact Resource Owner</span>
+                      <Package className="w-4 h-4 text-forest-700" />
+                      <span>{isAvailable ? 'Request / Reserve Quantity' : 'Resource Unavailable'}</span>
                     </button>
                   </>
                 )}
@@ -408,42 +406,26 @@ export function ResourceDetailsPage() {
                   </button>
                 </div>
               </div>
-
-              {/* No Delivery Rule Alert */}
-              <div className="bg-forest-50 border border-forest-200/60 rounded-xl p-3 text-[11px] text-forest-800 flex items-start gap-2">
-                <Info className="w-4 h-4 text-forest-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Self-Collection:</strong> You must coordinate pickup independently. ReLoop does not deliver.
-                </span>
-              </div>
             </div>
 
-            {/* Location & Google Maps Card */}
-            <div className="bg-white rounded-3xl p-6 border border-charcoal-100 shadow-xs space-y-4">
-              <h3 className="text-sm font-bold text-charcoal-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-forest-600" />
-                Collection Location (Google Maps Pinpointed)
-              </h3>
-
-              <div className="text-xs text-charcoal-600 space-y-1">
-                <p className="font-semibold text-charcoal-800">
-                  {formatPublicLocation(resource, false)}
-                </p>
-                <p className="text-[11px] text-charcoal-400">
-                  {resource.location_privacy === 'private_on_request'
-                    ? 'Precise street address is kept confidential until a request is confirmed.'
-                    : 'Exact geographic coordinates verified for community pickup.'}
-                </p>
+            {/* Location Info (Icon + Name Only, No Map) */}
+            <div className="bg-white rounded-3xl p-5 border border-charcoal-100 shadow-xs flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center shrink-0 border border-forest-100">
+                <MapPin className="w-5 h-5 text-forest-600" />
               </div>
-
-              {/* Map Preview */}
-              <ResourceLocationMap
-                lat={resource.lat || 45.5152}
-                lng={resource.lng || -122.6658}
-                locationName={resource.location_name}
-                city={resource.city}
-                height="180px"
-              />
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-400 block mb-0.5">
+                  Item Location
+                </span>
+                <p className="text-sm font-extrabold text-charcoal-900 truncate">
+                  {formatPublicLocation(resource, false) || resource.location_name || resource.city || 'Location available on contact'}
+                </p>
+                {resource.city && resource.city !== resource.location_name && (
+                  <span className="text-xs text-charcoal-500 block truncate">
+                    {resource.city}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Seller Public Profile Card */}

@@ -6,24 +6,6 @@ import { CATEGORIES } from '../utils/categories';
 export function Footer() {
   return (
     <footer className="bg-forest-950 text-forest-100 border-t border-forest-900 mt-20">
-      {/* Important Business Rule Disclaimer Banner */}
-      <div className="bg-forest-900/60 border-b border-forest-800/80 py-4 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
-          <div className="flex items-center gap-2 text-forest-200">
-            <AlertCircle className="w-5 h-5 text-fresh-400 shrink-0" />
-            <span>
-              <strong>Direct Collection Policy:</strong> ReLoop does not provide delivery services or delivery partners. Users communicate directly to inspect items and independently coordinate collection and transport.
-            </span>
-          </div>
-          <Link
-            to="/safety-and-guidelines"
-            className="text-fresh-300 hover:text-white underline font-medium shrink-0"
-          >
-            Read Community Safety Rules
-          </Link>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand Info */}
@@ -75,13 +57,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/how-it-works" className="hover:text-white transition">
-                  How Matching Works
+                <Link to="/about" className="hover:text-white transition">
+                  About ReLoop
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="hover:text-white transition">
-                  Next Best Use Concept
+                  Next Best Use & Safety
                 </Link>
               </li>
             </ul>
@@ -106,16 +88,16 @@ export function Footer() {
           {/* Safety & Trust */}
           <div>
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-              Trust & Security
+              Trust & Support
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-forest-200">
               <li>
-                <Link to="/safety-and-guidelines" className="hover:text-white transition">
+                <Link to="/about" className="hover:text-white transition">
                   Safety Guidelines
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-white transition">
+                <Link to="/about" className="hover:text-white transition">
                   Contact Support
                 </Link>
               </li>
@@ -125,8 +107,8 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/register" className="hover:text-white transition">
-                  Register as Workshop / NGO
+                <Link to="/admin" className="text-amber-300 hover:text-white transition font-semibold">
+                  🛡️ Admin Console (OLX)
                 </Link>
               </li>
             </ul>
@@ -137,9 +119,9 @@ export function Footer() {
         <div className="mt-12 pt-6 border-t border-forest-900 flex flex-col sm:flex-row items-center justify-between text-xs text-forest-400 gap-4">
           <p>© {new Date().getFullYear()} ReLoop Circular Ecosystem. Designed for waste prevention.</p>
           <div className="flex items-center space-x-6">
-            <Link to="/safety-and-guidelines" className="hover:text-forest-200">Terms & Safety</Link>
+            <Link to="/about" className="hover:text-forest-200">Safety & Guidelines</Link>
             <Link to="/about" className="hover:text-forest-200">Circular Charter</Link>
-            <Link to="/contact" className="hover:text-forest-200">Report an Issue</Link>
+            <Link to="/about" className="hover:text-forest-200">Contact Support</Link>
           </div>
         </div>
       </div>
