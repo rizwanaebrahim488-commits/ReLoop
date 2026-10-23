@@ -10,6 +10,8 @@ export default defineConfig({
     open: true
   },
   build: {
+    sourcemap: false,
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {

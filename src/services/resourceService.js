@@ -2,6 +2,7 @@ import { supabase, isConfigured } from '../lib/supabase';
 import { getStoreData, setStoreData, STORAGE_KEYS } from './localStore';
 import { calculateDistanceKm } from '../utils/maps';
 import { matchesCategory } from '../utils/categories';
+import { sanitizeText, sanitizeUrl, checkRateLimit } from '../utils/security';
 
 export async function getResources(filters = {}) {
   const {
@@ -40,7 +41,10 @@ export async function getResources(filters = {}) {
         query = query.eq('condition', condition);
       }
       if (search) {
-        query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,location_name.ilike.%${search}%`);
+        query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,location_name.ilike.%${search}%,category.ilike.%${search}%`);
+      }
+      if (locationQuery && locationQuery !== 'All Locations') {
+        query = query.or(`city.ilike.%${locationQuery}%,location_name.ilike.%${locationQuery}%`);
       }
 
       if (sort === 'price_asc') {
@@ -51,14 +55,39 @@ export async function getResources(filters = {}) {
         query = query.order('created_at', { ascending: false });
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
+      let { data, error } = await query;
+      if (error) {
+        // Fallback to simple select without joins if schema relationships aren't created yet
+        const simpleQuery = await supabase.from('resources').select('*');
+        if (!simpleQuery.error && simpleQuery.data) {
+          data = simpleQuery.data;
+          error = null;
+        } else {
+          throw error;
+        }
+      }
 
-      // Normalize images
-      return (data || []).map(item => ({
-        ...item,
-        images: item.resource_images?.map(i => i.image_url) || []
-      }));
+      // Normalize images with resilient fallback
+      return (data || []).map(item => {
+        let imgs = [];
+        if (item.resource_images && item.resource_images.length > 0) {
+          imgs = item.resource_images.map(i => i.image_url);
+        } else if (item.image_url) {
+          imgs = [item.image_url];
+        } else if (Array.isArray(item.images) && item.images.length > 0) {
+          imgs = item.images;
+        } else {
+          imgs = ['https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?auto=format&fit=crop&w=800&q=80'];
+        }
+        return {
+          ...item,
+          listing_type: item.listing_type || 'giveaway',
+          condition: item.condition || 'good',
+          available_quantity: item.available_quantity ?? item.quantity ?? 1,
+          quantity: item.quantity ?? 1,
+          images: imgs
+        };
+      });
     } catch (err) {
       console.warn('Supabase fetch failed, falling back to local store:', err);
     }
@@ -163,20 +192,42 @@ export async function getResourceById(id) {
 }
 
 export async function createResource(resourceData, images = []) {
+  // Anti-Spam Rate Limit
+  const rateLimit = checkRateLimit(`post_resource_${resourceData.user_id || 'anon'}`, { maxAttempts: 10, windowMs: 60000 });
+  if (!rateLimit.allowed) {
+    throw new Error(`Posting limit reached. Please wait ${rateLimit.retryAfterSec} seconds before creating another resource listing.`);
+  }
+
+  // Security Sanitization
+  const sanitizedResource = {
+    ...resourceData,
+    title: sanitizeText(resourceData.title, 200),
+    description: sanitizeText(resourceData.description, 4000),
+    category: sanitizeText(resourceData.category, 100),
+    location_name: sanitizeText(resourceData.location_name, 250),
+    city: sanitizeText(resourceData.city, 100),
+    pickup_instructions: sanitizeText(resourceData.pickup_instructions, 1000),
+    safety_notes: sanitizeText(resourceData.safety_notes, 1000),
+    quantity: Math.max(0.01, parseFloat(resourceData.quantity) || 1),
+    available_quantity: Math.max(0.01, parseFloat(resourceData.quantity) || 1),
+    price: Math.max(0, parseFloat(resourceData.price) || 0)
+  };
+
+  const safeImages = images
+    .map(url => sanitizeUrl(url))
+    .filter(Boolean);
+
   if (isConfigured) {
     try {
       const { data: resData, error: resError } = await supabase
         .from('resources')
-        .insert([{
-          ...resourceData,
-          available_quantity: resourceData.quantity
-        }])
+        .insert([sanitizedResource])
         .select()
         .single();
       if (resError) throw resError;
 
-      if (images.length > 0) {
-        const imageInserts = images.map((url, idx) => ({
+      if (safeImages.length > 0) {
+        const imageInserts = safeImages.map((url, idx) => ({
           resource_id: resData.id,
           image_url: url,
           is_primary: idx === 0
@@ -192,11 +243,10 @@ export async function createResource(resourceData, images = []) {
   const items = getStoreData(STORAGE_KEYS.RESOURCES);
   const newId = `res-${Date.now()}`;
   const newResource = {
-    ...resourceData,
+    ...sanitizedResource,
     id: newId,
-    available_quantity: resourceData.quantity,
     status: 'active',
-    images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80'],
+    images: safeImages.length > 0 ? safeImages : ['https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80'],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };

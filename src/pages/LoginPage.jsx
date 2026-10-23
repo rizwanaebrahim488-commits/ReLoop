@@ -14,6 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { checkRateLimit, sanitizeText } from '../utils/security';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -39,14 +40,23 @@ export function LoginPage() {
     setError('');
     setSuccessMsg('');
 
-    if (!email.trim() || !password) {
+    const cleanEmail = sanitizeText(email).toLowerCase();
+
+    if (!cleanEmail || !password) {
       setError('Please enter both email and password.');
+      return;
+    }
+
+    // Rate Limiting Protection (Anti-Brute Force)
+    const rateCheck = checkRateLimit(`login_${cleanEmail}`, { maxAttempts: 5, windowMs: 60000 });
+    if (!rateCheck.allowed) {
+      setError(`Too many login attempts. For security, please wait ${rateCheck.retryAfterSec} seconds.`);
       return;
     }
 
     setLoading(true);
     try {
-      await signIn({ email: email.trim(), password });
+      await signIn({ email: cleanEmail, password });
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
@@ -61,17 +71,26 @@ export function LoginPage() {
     setError('');
     setSuccessMsg('');
 
-    if (!email.trim() || !email.includes('@')) {
+    const cleanEmail = sanitizeText(email).toLowerCase();
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
       setError('Please enter a valid email address.');
+      return;
+    }
+
+    // Rate Limiting on OTP Dispatch
+    const rateCheck = checkRateLimit(`otp_${cleanEmail}`, { maxAttempts: 3, windowMs: 60000 });
+    if (!rateCheck.allowed) {
+      setError(`Verification code requests exceeded. Please wait ${rateCheck.retryAfterSec} seconds.`);
       return;
     }
 
     setLoading(true);
     try {
-      const res = await sendOtp(email.trim());
+      const res = await sendOtp(cleanEmail);
       setOtpSent(true);
       setGeneratedOtpDisplay(res.code);
-      setSuccessMsg(`Verification code sent to ${email.trim()}`);
+      setSuccessMsg(`Verification code sent to ${cleanEmail}`);
     } catch (err) {
       setError(err.message || 'Failed to send verification code.');
     } finally {

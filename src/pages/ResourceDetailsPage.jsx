@@ -212,10 +212,10 @@ export function ResourceDetailsPage() {
                 />
                 <div className="absolute top-4 left-4 flex gap-2">
                   <Badge variant="primary" className="bg-forest-900/80 backdrop-blur-md text-white border-none px-3 py-1 text-xs">
-                    {resource.listing_type === 'giveaway' ? 'Free Giveaway' : resource.listing_type}
+                    {resource.listing_type === 'giveaway' ? 'Free Giveaway' : (resource.listing_type || 'Available')}
                   </Badge>
                   <Badge variant="default" className="bg-white/90 backdrop-blur-md text-charcoal-900 px-3 py-1 text-xs font-semibold">
-                    {resource.condition?.replace('_', ' ')}
+                    {resource.condition ? resource.condition.replace('_', ' ') : 'Good condition'}
                   </Badge>
                 </div>
               </div>

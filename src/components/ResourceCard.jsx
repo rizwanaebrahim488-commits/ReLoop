@@ -58,10 +58,12 @@ export function ResourceCard({ resource, isFavoriteInit = false, onFavoriteChang
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
           <Badge variant={listingTypeVariants[resource.listing_type] || 'primary'}>
-            {resource.listing_type === 'giveaway' ? 'Free Giveaway' : resource.listing_type.replace('_', ' / ')}
+            {resource.listing_type === 'giveaway'
+              ? 'Free Giveaway'
+              : (resource.listing_type ? resource.listing_type.replace('_', ' / ') : 'Available')}
           </Badge>
           <Badge variant="default" className="bg-white/90 backdrop-blur-xs text-charcoal-800">
-            {resource.condition?.replace('_', ' ')}
+            {resource.condition ? resource.condition.replace('_', ' ') : 'Good condition'}
           </Badge>
         </div>
 

@@ -175,7 +175,7 @@ export function AuthProvider({ children }) {
           organization_name: '',
           organization_reg_no: '',
           is_verified: false,
-          is_admin: cleanEmail.includes('admin') || cleanEmail.startsWith('admin@'),
+          is_admin: false,
           city: 'Local Area',
           lat: 12.9716,
           lng: 77.5946,
@@ -185,13 +185,29 @@ export function AuthProvider({ children }) {
         };
         profiles.push(found);
         setStoreData(STORAGE_KEYS.PROFILES, profiles);
-      } else if (cleanEmail.includes('admin') || cleanEmail.startsWith('admin@')) {
-        found.is_admin = true;
-        setStoreData(STORAGE_KEYS.PROFILES, profiles);
       }
       localStorage.setItem(STORAGE_KEYS.ACTIVE_USER, found.id);
       setUser({ id: found.id, email: found.email });
       setProfile(found);
+
+      // Sync profile to cloud Supabase so it appears in Supabase dashboard
+      if (isConfigured) {
+        try {
+          await supabase.from('profiles').upsert([
+            {
+              email: cleanEmail,
+              full_name: found.full_name,
+              account_type: found.account_type || 'individual',
+              city: found.city || 'Local Area',
+              is_verified: found.is_verified || false,
+              is_admin: found.is_admin || false
+            }
+          ], { onConflict: 'email' });
+        } catch (err) {
+          console.warn('Could not sync profile to Supabase table:', err);
+        }
+      }
+
       return { user: { id: found.id, email: found.email }, profile: found };
     }
   }
@@ -256,7 +272,7 @@ export function AuthProvider({ children }) {
         organization_name: '',
         organization_reg_no: '',
         is_verified: false,
-        is_admin: cleanEmail.includes('admin') || cleanEmail.startsWith('admin@'),
+        is_admin: false,
         city: 'Local Area',
         lat: 12.9716,
         lng: 77.5946,
@@ -266,14 +282,30 @@ export function AuthProvider({ children }) {
       };
       profiles.push(found);
       setStoreData(STORAGE_KEYS.PROFILES, profiles);
-    } else if (cleanEmail.includes('admin') || cleanEmail.startsWith('admin@')) {
-      found.is_admin = true;
-      setStoreData(STORAGE_KEYS.PROFILES, profiles);
     }
 
     localStorage.setItem(STORAGE_KEYS.ACTIVE_USER, found.id);
     setUser({ id: found.id, email: found.email });
     setProfile(found);
+
+    // Sync profile to cloud Supabase so it appears in Supabase dashboard
+    if (isConfigured) {
+      try {
+        await supabase.from('profiles').upsert([
+          {
+            email: cleanEmail,
+            full_name: found.full_name,
+            account_type: found.account_type || 'individual',
+            city: found.city || 'Local Area',
+            is_verified: found.is_verified || false,
+            is_admin: found.is_admin || false
+          }
+        ], { onConflict: 'email' });
+      } catch (err) {
+        console.warn('Could not sync profile to Supabase table:', err);
+      }
+    }
+
     return { user: { id: found.id, email: found.email }, profile: found };
   }
 
@@ -318,11 +350,14 @@ export function AuthProvider({ children }) {
   async function updateProfile(updatedData) {
     if (!user) throw new Error('Not authenticated');
 
+    // Security: Filter out restricted fields to prevent privilege escalation
+    const { is_admin, is_verified, id, email, created_at, ...safeData } = updatedData;
+
     if (isConfigured) {
       const { data, error } = await supabase
         .from('profiles')
         .update({
-          ...updatedData,
+          ...safeData,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
@@ -335,7 +370,7 @@ export function AuthProvider({ children }) {
       const profiles = getStoreData(STORAGE_KEYS.PROFILES);
       const index = profiles.findIndex(p => p.id === user.id);
       if (index === -1) throw new Error('Profile not found');
-      const updated = { ...profiles[index], ...updatedData, updated_at: new Date().toISOString() };
+      const updated = { ...profiles[index], ...safeData, updated_at: new Date().toISOString() };
       profiles[index] = updated;
       setStoreData(STORAGE_KEYS.PROFILES, profiles);
       setProfile(updated);

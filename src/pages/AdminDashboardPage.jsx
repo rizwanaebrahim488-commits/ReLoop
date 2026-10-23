@@ -49,11 +49,6 @@ export function AdminDashboardPage() {
   const { user, profile, updateProfile } = useAuth();
   const navigate = useNavigate();
 
-  // Admin access gate
-  const [adminPasscode, setAdminPasscode] = useState('');
-  const [gateError, setGateError] = useState('');
-  const [isUnlocked, setIsUnlocked] = useState(profile?.is_admin || false);
-
   // Active Tab
   const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'support', 'listings', 'reports', 'users'
 
@@ -92,13 +87,7 @@ export function AdminDashboardPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    if (profile?.is_admin) {
-      setIsUnlocked(true);
-    }
-  }, [profile?.is_admin]);
-
-  useEffect(() => {
-    if (!isUnlocked && !profile?.is_admin) return;
+    if (!profile?.is_admin) return;
 
     async function loadAllAdminData() {
       setLoading(true);
@@ -123,22 +112,7 @@ export function AdminDashboardPage() {
     }
 
     loadAllAdminData();
-  }, [isUnlocked, profile?.is_admin, refreshKey]);
-
-  // Handle Admin Passcode Unlock
-  const handleUnlockAdmin = async (e) => {
-    e?.preventDefault();
-    if (adminPasscode.trim() === 'admin123' || adminPasscode.trim() === 'reloop2026' || adminPasscode === '') {
-      setIsUnlocked(true);
-      if (profile && !profile.is_admin) {
-        await updateUserAdmin(profile.id, true);
-        await updateProfile({ is_admin: true });
-      }
-      setGateError('');
-    } else {
-      setGateError('Incorrect administrator passcode. Please try again or use default: admin123');
-    }
-  };
+  }, [profile?.is_admin, refreshKey]);
 
   // Support Ticket Actions
   const handleOpenTicketModal = (t) => {
@@ -259,62 +233,29 @@ export function AdminDashboardPage() {
     );
   });
 
-  // Security Gate if not admin
-  if (!isUnlocked && !profile?.is_admin) {
+  // Security Gate: Administrator Privileges Required
+  if (!profile?.is_admin) {
     return (
       <div className="min-h-screen bg-offwhite flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-charcoal-200 shadow-xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto border border-amber-200">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200 shadow-xs">
             <Lock className="w-8 h-8" />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <h1 className="text-2xl font-black text-charcoal-900 tracking-tight">
-              Admin Moderation Gate
+              Admin Access Required
             </h1>
-            <p className="text-xs text-charcoal-500">
-              This area is restricted to platform administrators to manage support tickets, review reports, and moderate listings.
+            <p className="text-xs text-charcoal-500 leading-relaxed">
+              This area is restricted to verified platform administrators. Your account does not have administrative permissions.
             </p>
           </div>
-
-          {gateError && (
-            <div className="p-3 rounded-xl bg-rose-50 text-rose-800 text-xs border border-rose-200">
-              {gateError}
-            </div>
-          )}
-
-          <form onSubmit={handleUnlockAdmin} className="space-y-4">
-            <div>
-              <label className="block text-left text-xs font-bold text-charcoal-700 mb-1">
-                Admin Passcode (Default: <code className="text-forest-700">admin123</code>)
-              </label>
-              <input
-                type="password"
-                value={adminPasscode}
-                onChange={(e) => setAdminPasscode(e.target.value)}
-                placeholder="Enter passcode or click below"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-charcoal-200 text-sm focus:ring-2 focus:ring-forest-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Unlock Admin Dashboard</span>
-            </button>
-          </form>
-
           <div className="pt-2">
             <button
               type="button"
-              onClick={() => {
-                setAdminPasscode('admin123');
-                handleUnlockAdmin();
-              }}
-              className="text-xs text-forest-700 hover:text-forest-900 font-bold underline"
+              onClick={() => navigate('/dashboard')}
+              className="w-full py-3 rounded-xl bg-forest-700 hover:bg-forest-800 text-white font-bold text-xs sm:text-sm transition shadow-md"
             >
-              One-Click Evaluator Access (admin123)
+              Return to Member Dashboard
             </button>
           </div>
         </div>

@@ -185,12 +185,23 @@ export function App() {
             }
           />
 
-          {/* Admin Moderation Portal (OLX Model) */}
-          <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/support" element={<AdminDashboardPage />} />
-          <Route path="/admin/users" element={<AdminDashboardPage />} />
-          <Route path="/admin/listings" element={<AdminDashboardPage />} />
-          <Route path="/admin/reports" element={<AdminDashboardPage />} />
+          {/* Admin Moderation Portal (OLX Model) - Strictly Protected */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/:tab"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Fallback */}
           <Route path="*" element={<HomePage />} />

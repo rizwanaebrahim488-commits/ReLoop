@@ -1,6 +1,7 @@
 import { supabase, isConfigured } from '../lib/supabase';
 import { getStoreData, setStoreData, STORAGE_KEYS } from './localStore';
 import { createNotification } from './notificationsService';
+import { sanitizeText, checkRateLimit } from '../utils/security';
 
 export async function getUserConversations(userId) {
   if (isConfigured) {
@@ -144,6 +145,14 @@ export async function sendMessage(conversationId, senderId, content) {
   if (!content || !content.trim()) throw new Error('Message cannot be empty.');
   if (content.length > 2000) throw new Error('Message exceeds 2,000 character limit.');
 
+  // Rate Limiting Protection (Anti-Spam)
+  const rateLimit = checkRateLimit(`chat_msg_${senderId}`, { maxAttempts: 15, windowMs: 60000 });
+  if (!rateLimit.allowed) {
+    throw new Error(`Message frequency limit reached. Please wait ${rateLimit.retryAfterSec} seconds before sending another message.`);
+  }
+
+  const cleanContent = sanitizeText(content, 2000);
+
   if (isConfigured) {
     try {
       const { data, error } = await supabase
@@ -151,7 +160,7 @@ export async function sendMessage(conversationId, senderId, content) {
         .insert([{
           conversation_id: conversationId,
           sender_id: senderId,
-          content: content.trim(),
+          content: cleanContent,
           is_read: false
         }])
         .select()
@@ -176,7 +185,7 @@ export async function sendMessage(conversationId, senderId, content) {
     id: `msg-${Date.now()}`,
     conversation_id: conversationId,
     sender_id: senderId,
-    content: content.trim(),
+    content: cleanContent,
     is_read: false,
     created_at: new Date().toISOString()
   };

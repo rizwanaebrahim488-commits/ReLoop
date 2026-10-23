@@ -120,6 +120,68 @@ export async function createRequest({ resourceId, requesterId, ownerId, quantity
 }
 
 export async function updateRequestStatus(requestId, newStatus, currentUserId) {
+  if (isConfigured) {
+    try {
+      const { data: currentReq } = await supabase
+        .from('resource_requests')
+        .select('*, resource:resource_id(*)')
+        .eq('id', requestId)
+        .single();
+
+      if (currentReq) {
+        const resource = currentReq.resource;
+
+        if (newStatus === 'accepted') {
+          if (currentReq.owner_id !== currentUserId) throw new Error('Only the listing owner can accept requests.');
+          const available = parseFloat(resource?.available_quantity ?? resource?.quantity ?? 0);
+          const requested = parseFloat(currentReq.requested_quantity);
+
+          if (requested > available) {
+            throw new Error(`Cannot accept request: available quantity (${available}) is less than requested (${requested}).`);
+          }
+
+          const newAvailable = Math.max(0, available - requested);
+          const newStatusResource = newAvailable === 0 ? 'reserved' : resource.status;
+
+          await updateResource(resource.id, {
+            available_quantity: newAvailable,
+            status: newStatusResource
+          });
+
+          await createNotification({
+            userId: currentReq.requester_id,
+            type: 'request_accepted',
+            title: 'Request Approved!',
+            message: `Your request for ${requested} ${resource?.unit || 'items'} of "${resource?.title || 'Resource'}" was accepted. Coordinate collection in messages!`,
+            link: '/requests'
+          });
+        } else if (newStatus === 'rejected') {
+          if (currentReq.owner_id !== currentUserId) throw new Error('Only the listing owner can decline requests.');
+          await createNotification({
+            userId: currentReq.requester_id,
+            type: 'request_rejected',
+            title: 'Request Declined',
+            message: `Your request for "${resource?.title || 'Resource'}" was not accepted.`,
+            link: '/requests'
+          });
+        } else if (newStatus === 'cancelled') {
+          if (currentReq.requester_id !== currentUserId) throw new Error('Only the requester can cancel a request.');
+        }
+
+        const { data: updated, error: updErr } = await supabase
+          .from('resource_requests')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', requestId)
+          .select()
+          .single();
+
+        if (!updErr && updated) return updated;
+      }
+    } catch (e) {
+      console.warn('Supabase updateRequestStatus fallback:', e);
+    }
+  }
+
   const reqs = getStoreData(STORAGE_KEYS.REQUESTS);
   const req = reqs.find(r => r.id === requestId);
   if (!req) throw new Error('Request not found');
