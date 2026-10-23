@@ -366,6 +366,36 @@ export function HomePage() {
           </div>
         </div>
 
+        {/* Search feedback banner */}
+        {searchQuery && (
+          <div className="mb-6 p-4 rounded-2xl bg-forest-50 border border-forest-200 flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-forest-700 text-white flex items-center justify-center">
+                <Search className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-sm font-bold text-forest-950 block">
+                  Search results for &ldquo;{searchQuery}&rdquo;
+                </span>
+                <span className="text-xs text-charcoal-500">
+                  Found {resources.length} {resources.length === 1 ? 'matching item' : 'matching items'}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const p = new URLSearchParams(searchParams);
+                p.delete('search');
+                setSearchParams(p);
+              }}
+              className="px-3 py-1.5 rounded-lg bg-white border border-charcoal-200 text-xs font-bold text-charcoal-700 hover:text-forest-700 hover:border-forest-600 transition"
+            >
+              Clear Search ✕
+            </button>
+          </div>
+        )}
+
         {/* Resources Grid */}
         {loading ? (
           <div className="py-24 text-center space-y-2">

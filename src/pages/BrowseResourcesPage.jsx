@@ -45,20 +45,23 @@ export function BrowseResourcesPage() {
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('category') || 'all');
   const [listingTypeFilter, setListingTypeFilter] = useState(searchParams.get('type') || 'all');
   const [conditionFilter, setConditionFilter] = useState(searchParams.get('condition') || 'all');
+  const [locationFilter, setLocationFilter] = useState(searchParams.get('location') || '');
   const [sortBy, setSortBy] = useState('newest');
-  const [itemsToShow, setItemsToShow] = useState(8);
+  const [itemsToShow, setItemsToShow] = useState(12);
 
   // Sync state if URL query param changes
   useEffect(() => {
-    const urlCategory = searchParams.get('category');
-    if (urlCategory) setCategoryFilter(urlCategory);
-    const urlSearch = searchParams.get('search');
-    if (urlSearch) setSearchQuery(urlSearch);
+    const urlCategory = searchParams.get('category') || 'all';
+    setCategoryFilter(urlCategory);
+    const urlSearch = searchParams.get('search') || '';
+    setSearchQuery(urlSearch);
+    const urlLoc = searchParams.get('location') || '';
+    setLocationFilter(urlLoc);
   }, [searchParams]);
 
   useEffect(() => {
     loadResources();
-  }, [categoryFilter, listingTypeFilter, conditionFilter, sortBy]);
+  }, [searchQuery, categoryFilter, listingTypeFilter, conditionFilter, locationFilter, sortBy]);
 
   const loadResources = async () => {
     setLoading(true);
@@ -68,6 +71,7 @@ export function BrowseResourcesPage() {
         category: categoryFilter,
         listingType: listingTypeFilter,
         condition: conditionFilter,
+        locationQuery: locationFilter === 'All Locations' ? '' : locationFilter,
         sort: sortBy
       });
       setResources(data);
@@ -80,7 +84,13 @@ export function BrowseResourcesPage() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    loadResources();
+    const newParams = new URLSearchParams(searchParams);
+    if (searchQuery.trim()) {
+      newParams.set('search', searchQuery.trim());
+    } else {
+      newParams.delete('search');
+    }
+    setSearchParams(newParams);
   };
 
   const handleCategoryClick = (catName) => {

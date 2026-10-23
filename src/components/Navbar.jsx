@@ -193,20 +193,16 @@ export function Navbar() {
   // Handle Search Submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (searchTerm.trim()) {
-      params.set('search', searchTerm.trim());
-    } else {
-      params.delete('search');
+    const cleanSearch = searchTerm.trim();
+    const params = new URLSearchParams();
+    if (cleanSearch) {
+      params.set('search', cleanSearch);
     }
     if (selectedLocation && selectedLocation !== 'All Locations') {
       params.set('location', selectedLocation);
     }
-    setSearchParams(params);
 
-    if (window.location.hash.split('?')[0] !== '#/') {
-      navigate(`/?${params.toString()}`);
-    }
+    navigate(`/resources?${params.toString()}`);
   };
 
   const handleLogout = async () => {

@@ -35,7 +35,12 @@ function initStore(key, defaultData) {
       localStorage.setItem(key, JSON.stringify(defaultData));
       return defaultData;
     }
-    return JSON.parse(existing);
+    const parsed = JSON.parse(existing);
+    if (Array.isArray(parsed) && Array.isArray(defaultData) && parsed.length < defaultData.length && key === STORAGE_KEYS.RESOURCES) {
+      localStorage.setItem(key, JSON.stringify(defaultData));
+      return defaultData;
+    }
+    return parsed;
   } catch (err) {
     return defaultData;
   }

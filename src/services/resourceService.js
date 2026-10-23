@@ -40,11 +40,13 @@ export async function getResources(filters = {}) {
       if (condition && condition !== 'all') {
         query = query.eq('condition', condition);
       }
-      if (search) {
-        query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,location_name.ilike.%${search}%,category.ilike.%${search}%`);
+      if (search && search.trim()) {
+        const clean = search.trim();
+        query = query.or(`title.ilike.%${clean}%,description.ilike.%${clean}%,location_name.ilike.%${clean}%,category.ilike.%${clean}%,city.ilike.%${clean}%`);
       }
       if (locationQuery && locationQuery !== 'All Locations') {
-        query = query.or(`city.ilike.%${locationQuery}%,location_name.ilike.%${locationQuery}%`);
+        const cleanLoc = locationQuery.trim();
+        query = query.or(`city.ilike.%${cleanLoc}%,location_name.ilike.%${cleanLoc}%`);
       }
 
       if (sort === 'price_asc') {
@@ -58,7 +60,13 @@ export async function getResources(filters = {}) {
       let { data, error } = await query;
       if (error) {
         // Fallback to simple select without joins if schema relationships aren't created yet
-        const simpleQuery = await supabase.from('resources').select('*');
+        let fallbackQuery = supabase.from('resources').select('*');
+        if (status) fallbackQuery = fallbackQuery.eq('status', status);
+        if (category && category !== 'all') fallbackQuery = fallbackQuery.eq('category', category);
+        if (listingType && listingType !== 'all') fallbackQuery = fallbackQuery.eq('listing_type', listingType);
+        if (condition && condition !== 'all') fallbackQuery = fallbackQuery.eq('condition', condition);
+
+        const simpleQuery = await fallbackQuery;
         if (!simpleQuery.error && simpleQuery.data) {
           data = simpleQuery.data;
           error = null;
@@ -68,7 +76,7 @@ export async function getResources(filters = {}) {
       }
 
       // Normalize images with resilient fallback
-      return (data || []).map(item => {
+      let normalized = (data || []).map(item => {
         let imgs = [];
         if (item.resource_images && item.resource_images.length > 0) {
           imgs = item.resource_images.map(i => i.image_url);
@@ -88,6 +96,26 @@ export async function getResources(filters = {}) {
           images: imgs
         };
       });
+
+      // High-accuracy multi-word fuzzy matching on client side
+      if (search && search.trim()) {
+        const words = search.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        normalized = normalized.filter(item => {
+          const haystack = `${item.title} ${item.description} ${item.category} ${item.city} ${item.location_name}`.toLowerCase();
+          return words.every(w => haystack.includes(w));
+        });
+      }
+
+      if (locationQuery && locationQuery !== 'All Locations') {
+        const locLower = locationQuery.toLowerCase().trim();
+        normalized = normalized.filter(item => {
+          const cityMatch = (item.city || '').toLowerCase().includes(locLower);
+          const nameMatch = (item.location_name || '').toLowerCase().includes(locLower);
+          return cityMatch || nameMatch;
+        });
+      }
+
+      return normalized;
     } catch (err) {
       console.warn('Supabase fetch failed, falling back to local store:', err);
     }
